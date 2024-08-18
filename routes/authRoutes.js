@@ -1,31 +1,36 @@
 import express from "express";
 import User from "../models/userModel.js"
 import bcrypt from "bcryptjs/dist/bcrypt.js";
+import { guestRoute, protectedRoute } from "../middlewares/authMiddleware.js";
 
 const authRouter = express.Router();
 
 // Route for login
-authRouter.get('/login', (req, res) => {
-    res.render('login', {title: 'Login Page'});
+authRouter.get('/login', guestRoute, (req, res) => {
+    res.render('login', {title: 'Login Page', active: 'login'});
 });
 
 // Route for register
-authRouter.get('/register', (req, res) => {
-    res.render('register', {title: 'Register Page'});
+authRouter.get('/register', guestRoute, (req, res) => {
+    res.render('register', {title: 'Register Page', active: 'register'});
 });
 
 // Route for forgot password
-authRouter.get('/forgot-password', (req, res) => {
+authRouter.get('/forgot-password', guestRoute, (req, res) => {
     res.render('forgot-password', {title: 'Forgot Password Page'});
 });
 
 // Reset password
-authRouter.get('/reset-password', (req, res) => {
+authRouter.get('/reset-password', guestRoute, (req, res) => {
     res.render('reset-password', {title: 'Reset Password Page'});
 });
 
+authRouter.get('/profile', protectedRoute, (req, res) => {
+    res.render('profile', {title: 'Profile Page', active: 'profile'});
+});
+
 // Handle registration
-authRouter.post('/register', async(req, res) => {
+authRouter.post('/register', guestRoute, async(req, res) => {
     const { name, email, password } = req.body;
     try {
         const userExists = await User.findOne({ email })
@@ -58,7 +63,7 @@ authRouter.post('/register', async(req, res) => {
 });
 
 // Handle user login
-authRouter.post('/login', async(req, res) => {
+authRouter.post('/login', guestRoute, async(req, res) => {
     const { email, password} = req.body;
 
     try {
@@ -85,4 +90,11 @@ authRouter.post('/login', async(req, res) => {
         
     }
 });
+
+// Handle user logout
+authRouter.post('/logout', (req, res) => {
+    req.session.destroy();
+    res.redirect('/login');
+})
+
 export default authRouter;

@@ -36,12 +36,19 @@ app.use(function(req, res, next){
     res.locals.message = req.flash();
     next();
 })
+
+// Store authenticated user's session data for views
+app.use(function(req, res, next){
+    res.locals.user = req.session.user || null;
+    next();
+})
+
 // Set EJS as templating engine
 app.set('view engine', 'ejs')
 
 // Home route
 app.get('/', (req, res) => {
-    res.render('index', {title: 'Home Page'});
+    res.render('index', {title: 'Home Page', active: 'home'});
 });
 
 app.use('/', authRouter);

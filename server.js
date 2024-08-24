@@ -4,6 +4,7 @@ import authRouter from "./routes/authRoutes.js";
 import cookieParser from "cookie-parser";
 import session from "express-session";
 import flash from "connect-flash/lib/flash.js";
+import postRouter from "./routes/postRoutes.js";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -46,12 +47,11 @@ app.use(function(req, res, next){
 // Set EJS as templating engine
 app.set('view engine', 'ejs')
 
-// Home route
-app.get('/', (req, res) => {
-    res.render('index', {title: 'Home Page', active: 'home'});
-});
-
+// Auth routes
 app.use('/', authRouter);
+
+// Post routes
+app.use('/', postRouter);
 
 app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);

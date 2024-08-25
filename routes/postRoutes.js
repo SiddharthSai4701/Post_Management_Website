@@ -151,4 +151,34 @@ postRouter.post('/create-post', protectedRoute, upload.single('image'), async(re
 
 });
 
+
+// Handle delete post
+postRouter.post('/delete-post/:id', protectedRoute, async (req, res) => {
+    try {
+        const currentPost = await Post.findById(req.params.id);
+
+        if(!currentPost) {
+            req.flash('error', 'Post not found!');
+            return res.redirect('/my-posts');
+        }
+
+        await User.updateOne({ _id: req.session.user._id }, { $pull: { posts: req.params.id } });
+        await Post.deleteOne({ _id: req.params.id });
+
+        fs.unlink(path.join(process.cwd(), 'uploads') + '/' + currentPost.image, (err) => {
+            if(err) {
+                console.error(err);
+            }
+        });
+
+        req.flash('success', 'Post deleted successfully');
+        res.redirect('/my-posts');
+        
+    } catch (error) {
+        console.log(error);
+        req.flash('error', 'Something went wrong');
+        res.redirect('/my-posts')
+    }
+})
+
 export default postRouter;

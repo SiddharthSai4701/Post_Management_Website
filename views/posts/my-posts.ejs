@@ -41,7 +41,7 @@
                                     <%= post.createdAt.toLocaleDateString() %>
                                 </td>
                                 <td>
-                                    <a class="btn btn-sm btn-success" href="http:/posts/<%= post.slug %>">View</a>
+                                    <a class="btn btn-sm btn-success" href="http:/post/<%= post.slug %>">View</a>
                                     <a class="btn btn-sm btn-primary" href="/edit-post/<%= post._id %>">Edit Post</a>
                                     <form action="/delete-post/<%= post._id %>" method="post" class="d-inline">
                                         <button class="btn btn-sm btn-danger" type="submit">Delete</button>

@@ -23,7 +23,41 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage })
 
 // Home route
-postRouter.get('/', (req, res) => {
+postRouter.get('/', async (req, res) => {
+
+    try {
+        const page = parseInt(req.query.page) || 1;
+        const limit = 2;
+
+        // Defining the range between which we should fetch the posts
+        const startIndex = (page - 1) * limit;
+        const endIndex = page * limit;
+
+        const totalPosts = await Post.countDocuments().exec();
+
+        // Select all the user info except the password
+        // Sort the posts in descending order
+        const posts = await Post.find()
+        .populate({ path: 'user', select: '-password' })
+        .sort({ _id: -1 })
+        .limit(limit)
+        .skip(startIndex)
+        .exec();
+
+        const pagination = {
+            currentPage: page,
+            totalPage: Math.ceil(totalPosts / limit),
+            hasNextPage: endIndex < totalPosts,
+            hasPrevPage: startIndex > 0,
+            nextPage: page + 1,
+            prevPage: page - 1
+        };
+
+        res.render('index', { title: 'Home Page', active: 'home', posts, pagination })
+
+    } catch (error) {
+        
+    }
     res.render('index', { title: 'Home Page', active: 'home' });
 });
 
@@ -118,7 +152,7 @@ postRouter.post('/update-post/:id', protectedRoute, upload.single('image'), asyn
 })
 
 // Route for viewing a post
-postRouter.get('/posts/:slug', async (req, res) => {
+postRouter.get('/post/:slug', async (req, res) => {
     try {
 
         const slug = req.params.slug;

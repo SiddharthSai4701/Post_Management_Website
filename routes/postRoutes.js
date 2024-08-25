@@ -118,8 +118,25 @@ postRouter.post('/update-post/:id', protectedRoute, upload.single('image'), asyn
 })
 
 // Route for viewing a post
-postRouter.get('/post/:id', (req, res) => {
-    res.render('posts/view-post', {title: 'View Post', active: 'view_post'})
+postRouter.get('/posts/:slug', async (req, res) => {
+    try {
+
+        const slug = req.params.slug;
+        const post = await Post.findOne({ slug }).populate('user');
+
+        if(!post) {
+            req.flash('error', 'Post not found!');
+            return res.redirect('/my-posts');
+        }
+
+        res.render('posts/view-post', { title: 'View Post', active: 'view_post', post });
+
+        
+    } catch (error) {
+        console.error(error);
+        req.flash('error', 'An error occurred while updating your post!');
+        res.redirect('/my-posts');
+    }
 });
 
 // Handle create new post request

@@ -4,16 +4,16 @@
         <div class="col-lg-10 mx-auto">
             <div class="card shadow">
                 <div class="card-body p-5">
-                    <img src="https://images5.alphacoders.com/135/thumb-1920-1355115.jpeg" class="img-fluid" alt="Wallpaper">
+                    <img src="/uploads/<%= post.image %>" class="img-fluid" alt="<%= post.title %>">
                     <div class="lead my-3 d-flex align-items-center fw-semibold justify-content-between text-secondary flex-wrap gap-2">
-                        <div>Author: Siddharth</div>
-                        <div>Created: 24-08-2024</div>
+                        <div>Author: <%= post.user.name %></div>
+                        <div>Created: <%= post.createdAt.toLocaleDateString() %></div>
                     </div>
                     <h1 class="text-secondary fw-bold">
-                        Wallpaper
+                        <%= post.title %>
                     </h1>
                     <p>
-                        Blah Blah
+                        <%= post.content %>
                     </p>
                 </div>
             </div>

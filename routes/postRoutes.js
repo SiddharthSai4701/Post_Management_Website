@@ -1,10 +1,11 @@
-import express from "express";
+import express, { Route } from "express";
 import response from "express/lib/response.js";
 import { protectedRoute } from "../middlewares/authMiddleware.js";
 import multer from "multer";
 import path from 'path';
 import User from '../models/userModel.js';
 import Post from '../models/postModel.js'
+import fs from 'fs';
 
 const postRouter = express.Router();
 
@@ -35,7 +36,7 @@ postRouter.get('/my-posts', protectedRoute, async (req, res) => {
 
         if(!user) {
             req.flash('error', 'User not found!');
-            res.redirect('/');
+            return res.redirect('/');
         }
 
         res.render('posts/my-posts', { 
@@ -58,9 +59,63 @@ postRouter.get('/create-post', protectedRoute, (req, res) => {
 });
 
 // Route for editing a post
-postRouter.get('/edit-post/:id', protectedRoute, (req, res) => {
-    res.render('posts/edit-post', { title: 'Edit Post', active: 'edit_post' });
+postRouter.get('/edit-post/:id', protectedRoute, async (req, res) => {
+
+    try {
+        const currentPost = await Post.findById(req.params.id);
+
+        if(!currentPost) {
+            req.flash('error', 'Post not found!');
+            return res.redirect('/my-posts')
+        }
+
+        res.render('posts/edit-post', { title: 'Edit Post', active: 'edit_post', currentPost });
+
+    } catch (error) {
+        console.error(error);
+        req.flash('error', 'An error occurred while updating your post!');
+        res.redirect('/my-posts');
+    }
 });
+
+// Handle update post
+postRouter.post('/update-post/:id', protectedRoute, upload.single('image'), async (req, res) => {
+
+    try {
+        const currentPost = await Post.findById(req.params.id);
+
+        if (!currentPost) {
+            req.flash('error', 'Post not found!');
+            return res.redirect('/my-posts')
+        }
+
+        currentPost.title = req.body.title;
+        currentPost.content = req.body.content;
+        currentPost.slug = req.body.title.replace(/\s+/g, '-').toLowerCase();
+
+        // If there is a new file, we will first delete the old image from the uploads directory and then upload the new one
+        if (req.file) {
+            fs.unlink(path.join(process.cwd(), 'uploads') + '/' + currentPost.image, (err) => {
+                if(err) {
+                    console.error(err);
+                }
+            });
+
+            currentPost.image = req.file.filename;
+        }
+
+        await currentPost.save();
+
+        req.flash('success', 'Post updated successfully!');
+        res.redirect('/my-posts');
+        
+    } catch (error) {
+        console.error(error);
+        req.flash('error', 'An error occurred while updating your post!');
+        res.redirect('/my-posts');
+    }
+
+})
 
 // Route for viewing a post
 postRouter.get('/post/:id', (req, res) => {

@@ -1,7 +1,6 @@
 <%- include('partials/header') %>
 <div class="container my-4">
     <div class="row g-4">
-        
         <% posts.forEach((post) => { %>
             <div class="col-lg-6">
                 <div class="card shadow">
@@ -33,7 +32,7 @@
             </div>
         <% } %>
 
-        <span>Page <%= pagination.currentPage %> of <%= pagination.totalPage %></span>
+        <span>Page <%= pagination.totalPage === 0 ? 0 : pagination.currentPage %> of <%= pagination.totalPage %></span>
 
         <% if(pagination.hasNextPage) { %>
             <div>

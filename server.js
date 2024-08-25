@@ -6,6 +6,9 @@ import session from "express-session";
 import flash from "connect-flash/lib/flash.js";
 import postRouter from "./routes/postRoutes.js";
 import path from 'path';
+import ConnectMongodbSession from "connect-mongodb-session";
+
+const MongoDBStore = ConnectMongodbSession(session);
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -29,7 +32,11 @@ app.use(session({
     saveUninitialized: false,
     cookie: {
         maxAge: 60000*60*24*7 // Store cookies in the browser for 1 week before expiration
-    }
+    },
+    store: new MongoDBStore({
+        uri: process.env.MONGO_DB_URI,
+        collection: 'sessions'
+    })
 }));
 
 // flash messages middleware

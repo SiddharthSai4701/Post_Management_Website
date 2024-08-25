@@ -26,8 +26,30 @@ postRouter.get('/', (req, res) => {
     res.render('index', { title: 'Home Page', active: 'home' });
 });
 
-postRouter.get('/my-posts', protectedRoute, (req, res) => {
-    res.render('posts/my-posts', {title: 'My Posts', active: 'my_posts'})
+// My posts page
+postRouter.get('/my-posts', protectedRoute, async (req, res) => {
+
+    try {
+        const userId = req.session.user._id;
+        const user = await User.findById(userId).populate('posts');
+
+        if(!user) {
+            req.flash('error', 'User not found!');
+            res.redirect('/');
+        }
+
+        res.render('posts/my-posts', { 
+            title: 'My Posts', 
+            active: 'my_posts',
+            posts: user.posts 
+        });
+
+
+    } catch (error) {
+        console.error(error);
+        req.flash('error', 'An error occurred while fetching your posts!');
+        res.redirect('/my-posts');
+    }
 });
 
 // Route for creating a new post

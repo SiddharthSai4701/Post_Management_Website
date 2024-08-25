@@ -18,7 +18,7 @@ app.use(express.json());
 app.use(express.urlencoded({extended: false}));
 
 // Make uploads directory static
-app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
+app.use('/uploads', express.static(path.join(process.cwd(), '/uploads')));
 // cookies middleware
 app.use(cookieParser(process.env.COOKIE_SECRET));
 

@@ -30,14 +30,23 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <td>Post Title</td>
-                            <td>Post Content</td>
-                            <td>Post Image</td>
-                            <td>Post Created At</td>
-                            <td>
-                                <a class="btn bt-sm btn-primary" href="/edit-post/001">Edit Post</a>
-                                <a class="btn bt-sm btn-danger" href="/delete-post">Delete Post</a>
-                            </td>
+                           <% posts.forEach((post) => { %>
+                            <tr>
+                                <td><%= post.title %></td>
+                                <td><%= post.content.substring(0,50)%>...</td>
+                                <td>
+                                    <img src="/uploads/<%= post.image %>" alt="<%= post.title %>" class="img-fluid img-thumbnail" width="100">
+                                </td>
+                                <td>
+                                    <%= post.createdAt.toLocaleDateString() %>
+                                </td>
+                                <td>
+                                    <a class="btn btn-sm btn-success" href="http:/posts/<%= post.slug %>">View</a>
+                                    <a class="btn bt-sm btn-primary" href="/edit-post/<%= post._id %>">Edit Post</a>
+                                    <a class="btn bt-sm btn-danger" href="/delete-post<%= post._id %>">Delete Post</a>
+                                </td>
+                            </tr>
+                           <% }) %>
                         </tbody>
                     </table>
                 </div>
